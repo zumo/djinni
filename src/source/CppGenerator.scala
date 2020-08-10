@@ -139,7 +139,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
 
       // Write code to the header file
       w.wl
-      writeDoc(w, c.doc)
+      writeDoc(w, c.doc, idCpp.ty, "cpp")
       w.wl(s"static ${constFieldType} ${idCpp.const(c.ident)}${constValue}")
     }
   }
@@ -206,13 +206,13 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         w.wl
       }
-      writeDoc(w, doc)
+      writeDoc(w, doc, idCpp.ty, "cpp")
       writeCppTypeParams(w, params)
       w.w("struct " + actualSelf + cppFinal).bracedSemi {
         generateHppConstants(w, r.consts)
         // Field definitions.
         for (f <- r.fields) {
-          writeDoc(w, f.doc)
+          writeDoc(w, f.doc, idCpp.ty, "cpp")
           w.wl(marshal.fieldType(f.ty) + " " + idCpp.field(f.ident) + ";")
         }
 
@@ -326,7 +326,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
     val methodNamesInScope = i.methods.map(m => idCpp.method(m.ident))
 
     writeHppFile(ident, origin, refs.hpp, refs.hppFwds, w => {
-      writeDoc(w, doc)
+      writeDoc(w, doc, idCpp.ty, "cpp")
       writeCppTypeParams(w, typeParams)
       w.w(s"class $self").bracedSemi {
         w.wlOutdent("public:")

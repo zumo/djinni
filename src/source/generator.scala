@@ -399,7 +399,7 @@ abstract class Generator(spec: Spec)
 
   def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter) {
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.NoFlags))) {
-      writeDoc(w, o.doc)
+      writeDoc(w, o.doc, ident, "cpp")
       w.wl(ident(o.ident.name) + " = 0,")
     }
   }
@@ -407,7 +407,7 @@ abstract class Generator(spec: Spec)
   def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter) {
     var shift = 0
     for (o <- normalEnumOptions(e)) {
-      writeDoc(w, o.doc)
+      writeDoc(w, o.doc, ident, "cpp")
       w.wl(ident(o.ident.name) + (if(e.flags) s" = 1 << $shift" else "") + ",")
       shift += 1
     }
@@ -415,7 +415,7 @@ abstract class Generator(spec: Spec)
 
   def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter) {
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.AllFlags))) {
-      writeDoc(w, o.doc)
+      writeDoc(w, o.doc, ident, "cpp")
       w.w(ident(o.ident.name) + " = ")
       w.w(normalEnumOptions(e).map(o => ident(o.ident.name)).fold("0")((acc, o) => acc + " | " + o))
       w.wl(",")
@@ -430,10 +430,28 @@ abstract class Generator(spec: Spec)
       paramReplacements.foldLeft(l)((line, rep) =>
         line.replaceAll(rep._1, rep._2))
     }))
-    writeDoc(w, newDoc)
+    writeDoc(w, newDoc, ident, "cpp")
   }
 
-  def writeDoc(w: IndentWriter, doc: Doc) {
+  def writeDoc(w: IndentWriter, doc: Doc, ident: IdentConverter, lang: String) {
+    val newDoc = Doc(doc.lines.map(l => {
+      val seePattern = s"(@see\\s+)(\\S+)".r
+      val linkPattern = s"(@link\\s+)(\\S+)".r
+      val bothPatterns = s"(@(?:see|link)\\s+)(\\S+)".r
+      if (lang == "objc") {
+        val r1 = seePattern.replaceAllIn(l, m => s"${m.group(1)}`${ident(m.group(2))}`")
+        val r2 = linkPattern.replaceAllIn(r1, m => s"`${ident(m.group(2))}`")
+        r2
+      } else if (lang == "java") {
+        val r1 = seePattern.replaceAllIn(l, m => s"${m.group(1)}${ident(m.group(2))}")
+        val r2 = linkPattern.replaceAllIn(r1, m => s"{${m.group(1)} ${ident(m.group(2))} ${ident(m.group(2))}}")
+        r2
+      } else {
+        val r = bothPatterns.replaceAllIn(l, m => s"${m.group(1)}${ident(m.group(2))}")
+        r
+      }
+    }))
+
     doc.lines.length match {
       case 0 =>
       case 1 =>

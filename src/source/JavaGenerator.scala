@@ -94,7 +94,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     }
 
     for (c <- consts) {
-      writeDoc(w, c.doc)
+      writeDoc(w, c.doc, idJava.ty, "java")
       javaAnnotationHeader.foreach(w.wl)
       marshal.nullityAnnotation(c.ty).foreach(w.wl)
 
@@ -112,11 +112,11 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     val refs = new JavaRefs()
 
     writeJavaFile(ident, origin, refs.java, w => {
-      writeDoc(w, doc)
+      writeDoc(w, doc, idJava.ty, "java")
       javaAnnotationHeader.foreach(w.wl)
       w.w(s"${javaClassAccessModifierString}enum ${marshal.typename(ident, e)}").braced {
         for (o <- normalEnumOptions(e)) {
-          writeDoc(w, o.doc)
+          writeDoc(w, o.doc, idJava.ty, "java")
           w.wl(idJava.enum(o.ident) + ",")
         }
         w.wl(";")
@@ -141,7 +141,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     writeJavaFile(ident, origin, refs.java, w => {
       val javaClass = marshal.typename(ident, i)
       val typeParamList = javaTypeParams(typeParams)
-      writeDoc(w, doc)
+      writeDoc(w, doc, idJava.ty, "java")
 
       javaAnnotationHeader.foreach(w.wl)
 
@@ -186,7 +186,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             w.wl
           }
         }
-        
+
         if (i.ext.cpp) {
           w.wl
           javaAnnotationHeader.foreach(w.wl)
@@ -289,7 +289,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     }
 
     writeJavaFile(javaName, origin, refs.java, w => {
-      writeDoc(w, doc)
+      writeDoc(w, doc, idJava.ty, "java")
       javaAnnotationHeader.foreach(w.wl)
       val self = marshal.typename(javaName, r)
 
@@ -329,7 +329,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         // Accessors
         for (f <- r.fields) {
           w.wl
-          writeDoc(w, f.doc)
+          writeDoc(w, f.doc, idJava.ty, "java")
           marshal.nullityAnnotation(f.ty).foreach(w.wl)
           w.w("public " + marshal.returnType(Some(f.ty)) + " " + idJava.method("get_" + f.ident.name) + "()").braced {
             w.wl("return " + idJava.field(f.ident) + ";")
