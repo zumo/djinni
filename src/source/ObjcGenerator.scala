@@ -115,7 +115,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       if (i.ext.objc) w.wl(s"@protocol $self") else w.wl(s"@interface $self : NSObject")
       for (m <- i.methods) {
         w.wl
-        writeMethodDoc(w, m, idObjc.local)
+        writeMethodDoc(w, m, idObjc.local, idObjc.ty, "objc")
         writeObjcFuncDecl(m, w)
         w.wl(";")
       }

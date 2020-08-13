@@ -337,7 +337,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         // Methods
         for (m <- i.methods) {
           w.wl
-          writeMethodDoc(w, m, idCpp.local)
+          writeMethodDoc(w, m, idCpp.local, idCpp.ty, "cpp")
           val ret = marshal.returnType(m.ret, methodNamesInScope)
           val params = m.params.map(p => marshal.paramType(p.ty, methodNamesInScope) + " " + idCpp.local(p.ident))
           if (m.static) {
