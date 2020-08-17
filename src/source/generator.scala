@@ -452,13 +452,13 @@ abstract class Generator(spec: Spec)
       }
     }))
 
-    doc.lines.length match {
+    newDoc.lines.length match {
       case 0 =>
       case 1 =>
-        w.wl(s"/**${doc.lines.head} */")
+        w.wl(s"/**${newDoc.lines.head} */")
       case _ =>
         w.wl("/**")
-        doc.lines.foreach (l => w.wl(s" *$l"))
+        newDoc.lines.foreach (l => w.wl(s" *$l"))
         w.wl(" */")
     }
   }
