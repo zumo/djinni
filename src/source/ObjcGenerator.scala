@@ -50,7 +50,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
     val self = marshal.typename(ident, e)
     writeObjcFile(marshal.headerName(ident), origin, refs.header, w => {
-      writeDoc(w, doc, idJava.ty, "objc")
+      writeDoc(w, doc, idObjc.ty, "objc")
       w.wl(if(e.flags) {
         s"typedef NS_OPTIONS(NSUInteger, $self)"
       } else {
@@ -105,13 +105,13 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     // Generate the header file for Interface
     writeObjcFile(marshal.headerName(ident), origin, refs.header, w => {
       for (c <- i.consts if marshal.canBeConstVariable(c)) {
-        writeDoc(w, c.doc, idJava.ty, "objc")
+        writeDoc(w, c.doc, idObjc.ty, "objc")
         w.w(s"extern ")
         writeObjcConstVariableDecl(w, c, self)
         w.wl(s";")
       }
       w.wl
-      writeDoc(w, doc, idJava.ty, "objc")
+      writeDoc(w, doc, idObjc.ty, "objc")
       if (i.ext.objc) w.wl(s"@protocol $self") else w.wl(s"@interface $self : NSObject")
       for (m <- i.methods) {
         w.wl
@@ -121,7 +121,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       }
       for (c <- i.consts if !marshal.canBeConstVariable(c)) {
         w.wl
-        writeDoc(w, c.doc, idJava.ty, "objc")
+        writeDoc(w, c.doc, idObjc.ty, "objc")
         writeObjcConstMethDecl(c, w)
       }
       w.wl
@@ -171,7 +171,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
     // Generate the header file for record
     writeObjcFile(marshal.headerName(objcName), origin, refs.header, w => {
-      writeDoc(w, doc, idJava.ty, "objc")
+      writeDoc(w, doc, idObjc.ty, "objc")
       w.wl(s"@interface $self : NSObject")
 
       def writeInitializer(sign: String, prefix: String) {
@@ -185,13 +185,13 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
       for (c <- r.consts if !marshal.canBeConstVariable(c)) {
         w.wl
-        writeDoc(w, c.doc, idJava.ty, "objc")
+        writeDoc(w, c.doc, idObjc.ty, "objc")
         writeObjcConstMethDecl(c, w)
       }
 
       for (f <- r.fields) {
         w.wl
-        writeDoc(w, f.doc, idJava.ty, "objc")
+        writeDoc(w, f.doc, idObjc.ty, "objc")
         val nullability = marshal.nullability(f.ty.resolved).fold("")(", " + _)
         w.wl(s"@property (nonatomic, readonly${nullability}) ${marshal.fqFieldType(f.ty)} ${idObjc.field(f.ident)};")
       }
@@ -205,7 +205,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       if (r.consts.nonEmpty) {
         w.wl
         for (c <- r.consts if marshal.canBeConstVariable(c)) {
-          writeDoc(w, c.doc, idJava.ty, "objc")
+          writeDoc(w, c.doc, idObjc.ty, "objc")
           w.w(s"extern ")
           writeObjcConstVariableDecl(w, c, noBaseSelf);
           w.wl(s";")
