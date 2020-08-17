@@ -437,7 +437,6 @@ abstract class Generator(spec: Spec)
     val newDoc = Doc(doc.lines.map(l => {
       val seePattern = s"(@see\\s+)(\\S+)".r
       val linkPattern = s"(@link\\s+)(\\S+)".r
-      val bothPatterns = s"(@(?:see|link)\\s+)(\\S+)".r
       if (lang == "objc") {
         val r1 = seePattern.replaceAllIn(l, m => s"${m.group(1)}`${ident(m.group(2))}`")
         val r2 = linkPattern.replaceAllIn(r1, m => s"`${ident(m.group(2))}`")
@@ -447,8 +446,9 @@ abstract class Generator(spec: Spec)
         val r2 = linkPattern.replaceAllIn(r1, m => s"{${m.group(1)} ${ident(m.group(2))} ${ident(m.group(2))}}")
         r2
       } else {
-        val r = bothPatterns.replaceAllIn(l, m => s"${m.group(1)}${ident(m.group(2))}")
-        r
+        val r1 = seePattern.replaceAllIn(l, m => s"${m.group(1)}${ident(m.group(2))}")
+        val r2 = linkPattern.replaceAllIn(r1, m => s"${ident(m.group(2))}")
+        r2
       }
     }))
 
